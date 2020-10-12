@@ -1,26 +1,24 @@
 const imageContainer = document.getElementById('image-container');
 const loader = document.getElementById('loader');
 
-let ready = false;
+// current call varibles
+let isFinishedLoading= false;
 let imagesLoaded = 0;
-let totalImages = 0;
-let photosArr = [];
+let totalImagesToLoad = 0;
+let imagesArr = [];
+
 
 // Unsplash API
-const count = 5;
-const proxyURL = 'https://glacial-hollows-44805.herokuapp.com/'
+const numberOfImagesToLoad = 5;
 const APIkey = 'jW8UGxoKw5o9CUE4H7Xm9_L2udAVW_wdTBb1wHPgxck'
-const apiURL = `https://api.unsplash.com/photos/random/?client_id=${APIkey}&count=${count}`;
+const apiURL = `https://api.unsplash.com/photos/random/?client_id=${APIkey}&count=${numberOfImagesToLoad}`;
 
 // check if all images were loaded
 function imageLoaded(){
-    console.log('image loaded')
     imagesLoaded++;
-    console.log(imagesLoaded, totalImages)
     if (imagesLoaded === totalImages){
-        ready = true;
+        isFinishedLoading = true;
         loader.hidden = true;
-        console.log('ready!')
     }
 }
 
@@ -35,9 +33,8 @@ function setAttributes(element, attributes){
 // create Elements for links and photos, add to DOM
 function displayPhotos(){
     imagesLoaded = 0;
-    totalImages = photosArr.length;
-    console.log('total Images', totalImages)
-    photosArr.forEach(photo => {
+    totalImages = imagesArr.length;
+    imagesArr.forEach(photo => {
         const item = document.createElement('a'); // create ancer element to ling to unsplash website
 
         const img = document.createElement('img');// create img for photo
@@ -66,8 +63,8 @@ function displayPhotos(){
 // get photos from Unsplash API
 async function getPhotos(){
     try {
-        const response = await fetch(proxyURL+apiURL);
-        photosArr = await response.json();
+        const response = await fetch(apiURL);
+        imagesArr = await response.json();
         //console.log('photosarr',photosArr)
         displayPhotos();
     } catch (err){
@@ -83,9 +80,8 @@ window.addEventListener('scroll', () => {
     // window.scrollHeight - the distance from the top of the page
     // document.body.offsetHeight - everything that in the body - i.e all our images
     // - 1000 - so we will load before reaching to the very bottom
-    if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 1000 && ready){
-        console.log('load more')
-        ready = false;
+    if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 1000 && isFinishedLoading){
+        isFinishedLoading = false;
         getPhotos();
     }
 })
